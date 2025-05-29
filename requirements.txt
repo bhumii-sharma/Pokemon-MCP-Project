@@ -1,0 +1,24 @@
+# -- BACKEND (Python) ---
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+requests==2.32.3
+pydantic==2.7.1
+python-multipart==0.0.9
+
+# --TESTING & DEV ---
+httpx==0.27.0
+pytest==8.2.1
+pytest-asyncio==0.23.6
+
+# ---FRONTEND (React + Vite) ---
+# You must run this with npm (listed for documentation)
+# These are NOT installable via pip
+# Run separately in frontend/ directory:
+# npm create vite@latest frontend -- --template react
+# cd frontend && npm install
+
+# React + Vite stack (for your reference)
+# react
+# react-dom
+# vite
+# @vitejs/plugin-react
