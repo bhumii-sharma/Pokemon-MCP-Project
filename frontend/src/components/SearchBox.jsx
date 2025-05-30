@@ -1,51 +1,51 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import PokemonCard from './PokemonCard';
+import CounterSuggestion from './CounterSuggestions';
 
-const SearchBox = () => {
-  const [name, setName] = useState("");
-  const [pokemon, setPokemon] = useState(null);
+export default function SearchBox({ mode = 'info' }) {
+  const [query, setQuery] = useState('');
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleSearch = async () => {
+  const fetchData = async () => {
+    setError(null);
+    setResult(null);
+    if (!query) return;
+
     try {
-      const res = await axios.get(`/api/pokemon/${name.toLowerCase()}`);
-      setPokemon(res.data);
+      const endpoint =
+        mode === 'counter'
+          ? `http://127.0.0.1:8000/counters/${query.toLowerCase()}`
+          : `http://127.0.0.1:8000/pokemon/${query.toLowerCase()}`;
+      const res = await fetch(endpoint);
+
+      if (!res.ok) throw new Error('Not found');
+      const data = await res.json();
+      setResult(data);
     } catch (err) {
-      setPokemon(null);
+      setError('Pokémon not found or server error.');
     }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Search Pokémon</h2>
-      <div className="flex items-center gap-2 mb-4">
+    <div className="space-y-4">
+      <div className="flex gap-2">
         <input
           type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Enter Pokémon name"
-          className="border p-2 rounded w-full"
+          placeholder="Enter Pokémon name..."
+          className="flex-1 border p-2 rounded"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
-        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button className="btn" onClick={fetchData}>
           Search
         </button>
       </div>
 
-      {pokemon && (
-        <div className="bg-white shadow rounded p-4 max-w-md">
-          <h3 className="text-lg font-semibold capitalize">{pokemon.name}</h3>
-          <p><strong>Type:</strong> {pokemon.types.join(", ")}</p>
-          <p><strong>Stats:</strong></p>
-          <ul className="ml-4 list-disc">
-            {Object.entries(pokemon.stats).map(([stat, value]) => (
-              <li key={stat}>
-                {stat}: {value}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {error && <p className="text-red-600">{error}</p>}
+
+      {result && mode === 'info' && <PokemonCard pokemon={result} />}
+      {result && mode === 'counter' && <CounterSuggestion counters={result} />}
     </div>
   );
-};
-
-export default SearchBox;
+}

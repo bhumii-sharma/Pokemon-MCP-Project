@@ -1,53 +1,63 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import PokemonCard from './PokemonCard';
 
-const TeamGenerator = () => {
-  const [input, setInput] = useState("");
+export default function TeamGenerator() {
+  const [input, setInput] = useState('');
   const [team, setTeam] = useState([]);
+  const [error, setError] = useState(null);
 
-  const handleGenerate = async () => {
+  const handleGenerateTeam = async () => {
+    setError(null);
+    setTeam([]);
+
+    const names = input
+      .split(',')
+      .map((name) => name.trim().toLowerCase())
+      .filter((name) => name.length > 0);
+
+    if (names.length === 0) {
+      setError('Please enter at least one Pokémon name.');
+      return;
+    }
+
     try {
-      const res = await axios.post("/api/generate_team", { input });
-      setTeam(res.data);
-    } catch {
-      setTeam([]);
+      const res = await fetch('http://127.0.0.1:8000/generate-team', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pokemon: names }),
+      });
+
+      if (!res.ok) throw new Error('Team generation failed.');
+      const data = await res.json();
+      setTeam(data);
+    } catch (err) {
+      setError(err.message || 'Error generating team.');
     }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Generate Team</h2>
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Describe your needs"
-          className="border p-2 rounded w-full"
-        />
-        <button onClick={handleGenerate} className="bg-indigo-600 text-white px-4 py-2 rounded">
-          Generate
-        </button>
-      </div>
+    <div className="space-y-4">
+      <h3 className="text-xl font-semibold">Team Generator</h3>
+      <input
+        type="text"
+        placeholder="Enter Pokémon names separated by commas..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        className="w-full border p-2 rounded"
+      />
+      <button className="btn" onClick={handleGenerateTeam}>
+        Generate Team
+      </button>
+
+      {error && <p className="text-red-600">{error}</p>}
 
       {team.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {team.map(poke => (
-            <div key={poke.name} className="bg-white shadow rounded p-4">
-              <h3 className="text-lg font-semibold capitalize">{poke.name}</h3>
-              <p><strong>Type:</strong> {poke.types.join(", ")}</p>
-              <p><strong>Stats:</strong></p>
-              <ul className="ml-4 list-disc">
-                {Object.entries(poke.stats).map(([stat, val]) => (
-                  <li key={stat}>{stat}: {val}</li>
-                ))}
-              </ul>
-            </div>
+        <div className="grid md:grid-cols-2 gap-4">
+          {team.map((p, i) => (
+            <PokemonCard key={i} pokemon={p} />
           ))}
         </div>
       )}
     </div>
   );
-};
-
-export default TeamGenerator;
+}
