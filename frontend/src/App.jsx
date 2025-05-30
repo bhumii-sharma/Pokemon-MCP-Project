@@ -1,31 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import Info from './pages/Info';
-import Compare from './pages/Compare';
-import Team from './pages/Team';
+import React from 'react';
+import SearchBox from './components/SearchBox';
+import CompareBox from './components/CompareBox';
+import CounterSuggestions from './components/CounterSuggestions';
+import TeamGenerator from './components/TeamGenerator';
+import './index.css';
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-sky-100 to-blue-200 font-sans">
-        <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-700">Pokémon MCP</h1>
-          <nav className="space-x-4">
-            <NavLink to="/info" className={({ isActive }) => isActive ? 'text-blue-700 font-semibold' : 'text-gray-600 hover:text-blue-700'}>Info</NavLink>
-            <NavLink to="/compare" className={({ isActive }) => isActive ? 'text-blue-700 font-semibold' : 'text-gray-600 hover:text-blue-700'}>Compare</NavLink>
-            <NavLink to="/team" className={({ isActive }) => isActive ? 'text-blue-700 font-semibold' : 'text-gray-600 hover:text-blue-700'}>Team</NavLink>
-          </nav>
-        </header>
-
-        <main className="p-6">
-          <Routes>
-            <Route path="/info" element={<Info />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/team" element={<Team />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">Pokémon Toolkit</h1>
+      <SearchBox />
+      <CompareBox />
+      <CounterSuggestions />
+      <TeamGenerator />
+    </div>
   );
 }
-
-export default App;
