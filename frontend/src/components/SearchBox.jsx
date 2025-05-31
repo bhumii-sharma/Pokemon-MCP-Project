@@ -16,7 +16,7 @@ export default function SearchBox({ mode = 'info' }) {
       const endpoint =
         mode === 'counter'
           ? `http://127.0.0.1:8000/counters/${query.toLowerCase()}`
-          : `http://127.0.0.1:8000/pokemon/${query.toLowerCase()}`;
+          : `http://127.0.0.1:8000/api/pokemon/${query.toLowerCase()}`;
       const res = await fetch(endpoint);
 
       if (!res.ok) throw new Error('Not found');

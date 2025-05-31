@@ -1,43 +1,34 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import httpx
+from api import pokemon_routes  # Make sure this exists!
+import uvicorn
+
 
 app = FastAPI()
 
-# Allow frontend access (React on localhost:5173)
+app.include_router(pokemon_routes.router, prefix="/pokemon")
+
+
+# Allow React frontend to access the API
+origins = [
+    "http://localhost:5173",  # Vite dev server
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development, allow everything. Lock down in prod!
+    allow_origins=["http://localhost:5173"],  # or restrict to frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Optional welcome message at "/"
 @app.get("/")
-async def root():
-    return {"message": "Welcome to the Modular Control Platform for Pokémon!"}
+def read_root():
+    return {"message": "Welcome to the Pokémon API"}
 
-@app.get("/pokemon/{name}")
-async def get_pokemon(name: str):
-    url = f"https://pokeapi.co/api/v2/pokemon/{name.lower()}"
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="Pokémon not found")
-
-    data = response.json()
-
-    # Cleaned structure
-    result = {
-        "name": data["name"],
-        "types": [t["type"]["name"] for t in data["types"]],
-        "abilities": [a["ability"]["name"] for a in data["abilities"]],
-        "base_experience": data["base_experience"],
-        "height": data["height"],
-        "weight": data["weight"],
-        "sprite": data["sprites"]["front_default"],
-    }
-
-    return result
+# If you want to run it as `python main.py`
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

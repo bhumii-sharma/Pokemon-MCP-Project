@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Query
-from services.team_service import generate_balanced_team
+from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get("/team")
-def generate(description: str = Query(..., description="Team description")):
-    return generate_balanced_team(description)
+@router.post("/generate")
+def generate_team(strategy: str = "balanced"):
+    return {
+        "strategy": strategy,
+        "team": ["Pikachu", "Charizard", "Squirtle", "Bulbasaur", "Gengar", "Alakazam"]
+    }

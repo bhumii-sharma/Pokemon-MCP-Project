@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException
-from services.info_service import get_pokemon_info
+from services.info_service import fetch_pokemon_info
 
 router = APIRouter()
 
-@router.get("/{name}")
-def get_info(name: str):
-    try:
-        return get_pokemon_info(name)
-    except HTTPException as e:
-        raise e
+@router.get("/")
+def get_basic_info(name: str):
+    return fetch_pokemon_info(name)
+
+@router.get("/types")
+def get_pokemon_types():
+    return {"types": ["Fire", "Water", "Grass", "Electric", "Psychic"]}
